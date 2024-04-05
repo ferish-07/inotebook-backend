@@ -2,16 +2,8 @@ const express = require("express");
 const fetchuser = require("../middleware/fetchUsers");
 const Notes = require("../modals/Notes");
 const { body, validationResult } = require("express-validator");
+const User = require("../modals/User");
 const router = express.Router();
-
-async function getNextSequenceValue(sequenceName) {
-  var sequenceDocument = await Notes.findOneAndUpdate(
-    { _id: sequenceName },
-    { $inc: { sequence_value: 1 } },
-    { returnOriginal: false, upsert: true }
-  );
-  return sequenceDocument.value.sequence_value;
-}
 
 router.post(
   "/addNotes",
@@ -33,11 +25,13 @@ router.post(
     }
     try {
       const { title, description, tag } = req.body;
+      const user = await User.findById(req.user.id);
       Notes.create({
         user_id: req.user.id,
         title: title,
         description: description,
         tag: tag ? tag : "",
+        user_name: user.name,
       }).then(() => {
         res.send({ errors_status: false, message: "Notes Added Successfully" });
       });
@@ -97,5 +91,32 @@ router.post(
     }
   }
 );
+
+router.delete("/deletenotes/:id", fetchuser, async (req, res) => {
+  await Notes.findById(req.params.id.toString())
+    .then(async (notess) => {
+      if (notess.user_id == req.user.id) {
+        await Notes.findByIdAndDelete(req.params.id)
+          .then(() => {
+            res.send({
+              errors_status: false,
+              messsage: "Note Deleted Successfully",
+            });
+          })
+          .catch((error) => {
+            res.send({ errors_status: true, message: error.message });
+          });
+      } else {
+        res.send({
+          errors_status: true,
+          message: "Note not mapped with the user",
+        });
+      }
+    })
+    .catch((error) => {
+      console.log("er", error);
+      res.send({ message: error.message.toString() });
+    });
+});
 
 module.exports = router;

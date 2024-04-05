@@ -22,6 +22,9 @@ const NotesSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  user_name: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("notes", NotesSchema);
