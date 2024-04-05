@@ -145,4 +145,37 @@ router.post("/getuser", fetchuser, async (req, res) => {
   }
 });
 
+router.post("/changepassword", fetchuser, async (req, res) => {
+  const { email, old_password, password, confirm_password } = req.body;
+  const user = await User.findOne({ email: email });
+  const passwordCompare = await bcrypt.compare(old_password, user.password);
+
+  if (!passwordCompare) {
+    return res.send({
+      error_status: true,
+      message: "Please enter your correct password",
+    });
+  }
+
+  if (password === confirm_password) {
+    const salt = await bcrypt.genSalt(10);
+    const securePassword = await bcrypt.hash(confirm_password, salt);
+
+    await User.updateOne(
+      { email: email },
+      { $set: { password: securePassword } }
+    ).then(() => {
+      return res.send({
+        error_status: false,
+        message: "Password changed Successfully",
+      });
+    });
+  } else {
+    return res.send({
+      error_status: true,
+      message: "Passwords do not match. Please try again.",
+    });
+  }
+});
+
 module.exports = router;
