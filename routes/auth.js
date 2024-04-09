@@ -84,16 +84,18 @@ router.post(
     try {
       let user = await User.findOne({ email });
       if (!user) {
-        return res
-          .status(400)
-          .send({ error: "Please enter correct username/Password" });
+        return res.send({
+          error_status: true,
+          message: "Please enter correct username/Password",
+        });
       }
 
       const passwordCompare = await bcrypt.compare(password, user.password);
       if (!passwordCompare) {
-        return res
-          .status(400)
-          .send({ error: "Please enter correct username/Password" });
+        return res.send({
+          error_status: true,
+          message: "Please enter correct username/Password",
+        });
       }
 
       const data = {
