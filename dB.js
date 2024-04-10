@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const mongoURL =
-  "mongodb://0.0.0.0:27017/inotebook?readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false";
+  "mongodb+srv://modiferish:Ferish123@ferish.ol6gmp9.mongodb.net/iNotebook";
 
 const connectToMongo = () => {
   mongoose

@@ -86,7 +86,7 @@ router.post(
       if (!user) {
         return res.send({
           error_status: true,
-          message: "Please enter correct username/Password",
+          message: "User Does not Exits",
         });
       }
 
